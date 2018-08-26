@@ -37,19 +37,24 @@ class BooksAdd extends Component {
 
     searchForBook = (searchTerm) => {
         if (searchTerm.length !== 0) {
-          BooksAPI.search(searchTerm).then((books) => {
-            if (books.length > 0) {
+          BooksAPI.search(searchTerm, 15).then((books) => {
+            if (books !== undefined && books.error !== 'empty query') {
               books = books.filter((book) => (book.imageLinks))
               books = this.changeTheShelf(books)
               this.setState(() => {
                 return {Books: books}
               })
-            }
-          })
+            } else {
+              this.setState({Books: []})
+            } 
+          }) 
+          
         } else {
           this.setState({Books: [], query: ''})
         }
       }
+      
+    
  
 // change the shelf of book in results
 
