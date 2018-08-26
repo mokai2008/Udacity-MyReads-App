@@ -4,12 +4,19 @@ import Book from './Book'
 import {Link} from 'react-router-dom'
 import escapeRegExp from 'escape-string-regexp'
 import sortBy from 'sort-by'
+import PropTypes from 'prop-types'
 
 
 class BooksAdd extends Component {
+
+    static propTypes = {
+        currentBooks: PropTypes.array.isRequired,
+        onChange: PropTypes.func.isRequired
+    }
+
     state = {
-      Books: [],
-      query: ''
+      query: '',
+      Books: []
     }
 
     updateQuery = (query) => {

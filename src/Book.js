@@ -1,7 +1,13 @@
 import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 
 
 class Book extends Component {
+
+  static propTypes = {
+    book: PropTypes.object.isRequired,
+    updateShelf: PropTypes.func.isRequired
+  }
 
   // changing the shelf of the book function
 
@@ -12,7 +18,7 @@ class Book extends Component {
   render() {
 
     //shorting some code
-    
+
     const bookShort = this.props.book
     return (
       <li>
