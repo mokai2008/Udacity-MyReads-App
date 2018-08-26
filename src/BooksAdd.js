@@ -19,12 +19,13 @@ class BooksAdd extends Component {
       Books: []
     }
 
-    updateQuery = (query) => {
+    updateQuery = (event) => {
+      const value = event.target.value
         this.setState(() => {
-            return {query: query.trim()}
+            return {query: value}
           })
 
-          this.searchForBook(query.trim())
+          this.searchForBook(value)
     }
 
 /* I have tried alot to use the regExp but there's a problem 
@@ -83,7 +84,7 @@ class BooksAdd extends Component {
             <div className="search-books-input-wrapper">
               <input type="text" placeholder="Search by title or author"
                value={this.state.query} 
-               onChange={(event) => this.updateQuery(event.target.value)}/>
+               onChange={this.updateQuery}/>
             </div>
           </div>
           <div className="search-books-results">
