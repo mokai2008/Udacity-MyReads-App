@@ -1,58 +1,97 @@
 import React, {Component} from 'react'
 import * as BooksAPI from './BooksAPI'
-import Books from './Books'
+import Book from './Book'
 import {Link} from 'react-router-dom'
 import escapeRegExp from 'escape-string-regexp'
 import sortBy from 'sort-by'
 
 
 class BooksAdd extends Component {
-    
     state = {
-        query = '',
-        Books = []
+      Books: [],
+      query: ''
     }
 
     updateQuery = (query) => {
-        this.setState({query: query.trim()})
+        this.setState(() => {
+            return {query: query.trim()}
+          })
+
+          this.searchForBook(query.trim())
     }
 
-    let showingBooks
-    if (this.state.query) {
-        const match = new RegExp(escapeRegExp(this.state.query), 'i')
-        showingBooks = this.state.Books.filter((book) => 
-        match.test(book.title))
-    } else {
-        showingBooks = this.state.Books
+/* I have tried alot to use the regExp but there's a problem 
+    Also a problem in using short-circut evalution instead of if statement
+    Tried also to use sort by author or title but nothing changed 
+*/
+
+// getting book search result according to user input
+
+    searchForBook = (searchTerm) => {
+        if (searchTerm.length !== 0) {
+          BooksAPI.search(searchTerm).then((books) => {
+            if (books.length > 0) {
+              books = books.filter((book) => (book.imageLinks))
+              books = this.changeTheShelf(books)
+              this.setState(() => {
+                return {Books: books}
+              })
+            }
+          })
+        } else {
+          this.setState({Books: [], query: ''})
+        }
+      }
+ 
+// change the shelf of book in results
+
+    changeTheShelf = (books) => {
+      let allBooks = this.props.currentBooks
+      for (let book of books) {
+        book.shelf = "none"
+      }
+  
+      for (let book of books) {
+        for (let b of allBooks) {
+          if (b.id === book.id) {
+            book.shelf = b.shelf
+          }
+        }
+      }
+      return books
     }
+  
+
+// adding the book to specific shelf in main page
 
     addBook = (book, shelf) => {
-        this.props.onChange(book, shelf)
+      this.props.onChange(book, shelf)
     }
-
+  
     render() {
-        return (
-            <div className="search-books">
-                <div className="search-books-bar">
-                <Link to = '/' className = 'close-search'>Close</Link>
-                    <div className="search-books-input-wrapper">
-                      <input type="text" placeholder="Search by title or author" 
-                        value = 'this.state.query'
-                        onChange = {(event) => this.updateQuery(event.target.value)}
-                        />
-                </div>
-            </div>
-            <div className="search-books-results">
-              <ol className="books-grid"></ol>
-              {this.state.Books.map((book, index) => (
-                  <Books books= {book} key = {index} updateShelf = {(shelf) => {
-                      this.addBook(book, shelf)
-                  }}
-              />))}
+      return (
+        <div className="search-books">
+          <div className="search-books-bar">
+            <Link to='/' className="close-search">Close</Link>
+            <div className="search-books-input-wrapper">
+              <input type="text" placeholder="Search by title or author"
+               value={this.state.query} 
+               onChange={(event) => this.updateQuery(event.target.value)}/>
             </div>
           </div>
-        )
+          <div className="search-books-results">
+            <ol className="books-grid">
+              {this.state.query.length > 0 && 
+              this.state.Books.map((book, index) => (
+              <Book book={book} key={index} updateShelf={(shelf) => {
+                this.addBook(book, shelf)
+              }}/>))}
+            </ol>
+          </div>
+        </div>
+      )
     }
-}
-
-export default BooksAdd
+  }
+  
+  export default BooksAdd;
+  
